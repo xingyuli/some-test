@@ -4,11 +4,21 @@ import static junit.framework.Assert.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Logger;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class InputStreamVerifierTest {
 
+	private Logger mockLog;
+	
+	@Before
+	public void setUp() {
+		mockLog = Mockito.mock(Logger.class);
+	}
+	
 	/*
 	 * constructor - InputStreamVerifier(byte[])
 	 * 
@@ -79,6 +89,7 @@ public class InputStreamVerifierTest {
 	@Test
 	public void use1() throws FileNotFoundException {
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("use1.tmp"));
+		provider.setLogger(mockLog);
 		InputStreamVerifier verifier = new InputStreamVerifier(new byte[0]);
 		provider.usedBy(verifier);
 		assertTrue(verifier.isMatched());
@@ -91,6 +102,7 @@ public class InputStreamVerifierTest {
 	@Test
 	public void use2() throws IOException {
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("use2.tmp"));
+		provider.setLogger(mockLog);
 		InputStreamVerifier verifier = new InputStreamVerifier(new byte[] { 1 });
 		FileUtil.write(provider.getPath(), (byte) 1);
 		provider.usedBy(verifier);
@@ -100,6 +112,7 @@ public class InputStreamVerifierTest {
 	@Test
 	public void use3() throws IOException {
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("use3.tmp"));
+		provider.setLogger(mockLog);
 		InputStreamVerifier verifier = new InputStreamVerifier(new byte[] { 1, 1, 1, 1 });
 		FileUtil.write(provider.getPath(), new byte[] { 1, 1, 1, 1 });
 		provider.usedBy(verifier);
@@ -114,6 +127,7 @@ public class InputStreamVerifierTest {
 	public void use4() throws IOException {
 		byte[] expectedData = new byte[] { 1, 2, 3, 4};
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("use4.tmp"));
+		provider.setLogger(mockLog);
 		InputStreamVerifier verifier = new InputStreamVerifier(expectedData);
 		
 		FileUtil.write(provider.getPath(), new byte[] {1, 2, 3, 4});

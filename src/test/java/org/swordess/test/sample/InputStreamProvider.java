@@ -14,7 +14,9 @@ import org.apache.commons.lang.StringUtils;
 
 public class InputStreamProvider {
 
-	private static final Logger LOG = Logger.getLogger("input-stream-provider");
+	private static final Logger DEFAULT_LOG = Logger.getLogger("input-stream-provider");
+	
+	private Logger log;
 	
 	private final String path;
 	
@@ -33,7 +35,9 @@ public class InputStreamProvider {
 		if (!new File(path).exists()) {
 			throw new FileNotFoundException(path);
 		}
+
 		this.path = path;
+		this.log = DEFAULT_LOG;
 	}
 	
 	/**
@@ -57,7 +61,7 @@ public class InputStreamProvider {
 	public void usedBy(InputStreamUser inUser) {
 		InputStream in = null;
 		try {
-			LOG.log(Level.INFO, "opening InputStream for " + path + " ...");
+			log.log(Level.INFO, "opening InputStream for " + path + " ...");
 			in = new FileInputStream(path);
 			inUser.use(in);
 		} catch (FileNotFoundException e) {
@@ -67,11 +71,11 @@ public class InputStreamProvider {
 		} finally {
 			if (null != in) {
 				try {
-					LOG.log(Level.INFO, "closing InputStream ...");
+					log.log(Level.INFO, "closing InputStream ...");
 					in.close();
-					LOG.log(Level.INFO, "InputStream closed");
+					log.log(Level.INFO, "InputStream closed");
 				} catch (IOException e) {
-					LOG.log(Level.WARNING, "cannot close InputStream", e);
+					log.log(Level.WARNING, "cannot close InputStream", e);
 				}
 			}
 		}
@@ -91,13 +95,13 @@ public class InputStreamProvider {
 	public void usedBy(Collection<? extends InputStreamUser> inUsers) {
 		BufferedInputStream in  = null;
 		try {
-			LOG.log(Level.INFO, "opening BufferedInputStream for " + path + " ...");
+			log.log(Level.INFO, "opening BufferedInputStream for " + path + " ...");
 			in = new BufferedInputStream(new FileInputStream(path));
 			for (InputStreamUser inUser : inUsers) {
 				in.mark(Integer.MAX_VALUE);
 				inUser.use(in);
 				in.reset();
-				LOG.log(Level.INFO, "stream has been reset");
+				log.log(Level.INFO, "stream has been reset");
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -106,14 +110,18 @@ public class InputStreamProvider {
 		} finally {
 			if (null != in) {
 				try {
-					LOG.log(Level.INFO, "closing BufferedInputStream ...");
+					log.log(Level.INFO, "closing BufferedInputStream ...");
 					in.close();
-					LOG.log(Level.INFO, "BufferedInputStream closed");
+					log.log(Level.INFO, "BufferedInputStream closed");
 				} catch (IOException e) {
-					LOG.log(Level.WARNING, "cannot close BufferedInputStream", e);
+					log.log(Level.WARNING, "cannot close BufferedInputStream", e);
 				}
 			}
 		}
+	}
+	
+	public void setLogger(Logger log) {
+		this.log = log;
 	}
 	
 	public String getPath() {

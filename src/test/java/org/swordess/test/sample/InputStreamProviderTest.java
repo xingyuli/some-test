@@ -10,9 +10,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.swordess.test.Boundary;
 import org.swordess.test.Cover;
 import org.swordess.test.CoverChecker;
@@ -86,6 +89,13 @@ public class InputStreamProviderTest {
 	
 	private static int ACTUAL_INVOKE_NUMBER = 0;
 	
+	private Logger mockLog;
+	
+	@Before
+	public void setUp() {
+		mockLog = Mockito.mock(Logger.class);
+	}
+	
 	@Cover(
 		methodSignature = SIGNATURE_INPUT_STREAM_PROVIDER,
 		conditions = "StringUtils.isBlank(path)", invalidECs = 2, boundaries = 1)
@@ -125,6 +135,7 @@ public class InputStreamProviderTest {
 	@Test
 	public void testECUsedBy1() throws FileNotFoundException {
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("usedBy1.tmp"));
+		provider.setLogger(mockLog);
 		provider.usedBy(new InputStreamUser() {
 			@Override
 			public void use(InputStream in) throws IOException {
@@ -137,6 +148,7 @@ public class InputStreamProviderTest {
 	@Test(expected = NullPointerException.class)
 	public void testECUsedBy2() throws FileNotFoundException {
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("usedBy2.tmp"));
+		provider.setLogger(mockLog);
 		provider.usedBy((InputStreamUser)null);
 	}
 	
@@ -144,6 +156,7 @@ public class InputStreamProviderTest {
 	@Test
 	public void testBoundaryUsedBy1() throws FileNotFoundException {
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("usedBy3.tmp"));
+		provider.setLogger(mockLog);
 		provider.usedBy(new InputStreamUser() {
 			@Override
 			public void use(InputStream in) throws IOException {
@@ -169,6 +182,7 @@ public class InputStreamProviderTest {
 		}
 		
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("usedBySeveralUsers1.tmp"));
+		provider.setLogger(mockLog);
 		provider.usedBy(users);
 		
 		// verify the invoke number for each stream user
@@ -181,6 +195,7 @@ public class InputStreamProviderTest {
 	@Test(expected = NullPointerException.class)
 	public void testECUsedBySeveralUsers2() throws FileNotFoundException {
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("usedBySeveralUsers2.tmp"));
+		provider.setLogger(mockLog);
 		provider.usedBy((Collection<InputStreamUser>)null);
 	}
 	
@@ -188,6 +203,7 @@ public class InputStreamProviderTest {
 	@Test
 	public void testBoundaryUsedBySeveralUsers1() throws FileNotFoundException {
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("usedBySeveralUsers3.tmp"));
+		provider.setLogger(mockLog);
 		provider.usedBy(Collections.<InputStreamUser>emptySet());
 	}
 	
@@ -198,6 +214,7 @@ public class InputStreamProviderTest {
 		Collections.fill(usersWithNullElements, null);
 		
 		InputStreamProvider provider = new InputStreamProvider(FileUtil.ensureExistence("usedBySeveralUsers4.tmp"));
+		provider.setLogger(mockLog);
 		provider.usedBy(usersWithNullElements);
 	}
 	
