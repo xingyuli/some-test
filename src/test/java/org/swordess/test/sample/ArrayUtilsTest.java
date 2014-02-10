@@ -1,11 +1,9 @@
 package org.swordess.test.sample;
 
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.anyInt;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.swordess.test.Boundary;
 import org.swordess.test.Cover;
 import org.swordess.test.CoverChecker;
@@ -95,12 +93,14 @@ public class ArrayUtilsTest {
 	
 	static final String SIGNATURE_EQUALS = "equals(byte[], int, byte[], int, int)"; 
 	
+	static final int IGNORE = -1;
+	
 	@Cover(
 		methodSignature = SIGNATURE_EQUALS,
 		conditions = {"src = null", "dest = null"}, validECs = {1,5}, boundaries = {1,10})
 	@Test
 	public void testConditionEquals1() {
-		assertTrue(ArrayUtils.equals(null, anyInt(), null, anyInt(), anyInt()));
+		assertTrue(ArrayUtils.equals(null, IGNORE, null, IGNORE, IGNORE));
 	}
 	
 	@Cover(
@@ -108,7 +108,7 @@ public class ArrayUtilsTest {
 		conditions = {"src = null", "dest = any"}, boundaries = 11)
 	@Test
 	public void testConditionEquals2() {
-		assertTrue(!ArrayUtils.equals(null, anyInt(), new byte[0], anyInt(), anyInt()));
+		assertTrue(!ArrayUtils.equals(null, IGNORE, new byte[0], IGNORE, IGNORE));
 	}
 	
 	@Cover(
@@ -116,7 +116,7 @@ public class ArrayUtilsTest {
 		conditions = {"src = any not null", "dest = null"}, boundaries = 2)
 	@Test
 	public void testConditionEquals3() {
-		assertTrue(!ArrayUtils.equals(new byte[0], anyInt(), null, anyInt(), anyInt()));
+		assertTrue(!ArrayUtils.equals(new byte[0], IGNORE, null, IGNORE, IGNORE));
 	}
 	
 	@Cover(
@@ -124,7 +124,7 @@ public class ArrayUtilsTest {
 		conditions = {"src.length = 0", "dest.length = 0"})
 	@Test
 	public void testConditionEquals4() {
-		assertTrue(ArrayUtils.equals(new byte[0], anyInt(), new byte[0], anyInt(), anyInt()));
+		assertTrue(ArrayUtils.equals(new byte[0], IGNORE, new byte[0], IGNORE, IGNORE));
 	}
 	
 	@Cover(
@@ -132,7 +132,7 @@ public class ArrayUtilsTest {
 		conditions = {"src.length = 0", "dest.length > 0"}, validECs = 6, boundaries = {12,14,16})
 	@Test
 	public void testConditionEquals5() {
-		assertTrue(!ArrayUtils.equals(new byte[0], anyInt(), new byte[]{1}, 0, anyInt()));
+		assertTrue(!ArrayUtils.equals(new byte[0], IGNORE, new byte[]{1}, 0, IGNORE));
 	}
 	
 	@Cover(
@@ -140,7 +140,7 @@ public class ArrayUtilsTest {
 		conditions = {"src.length > 0", "dest.length = 0"}, validECs = 2, boundaries = {3,5,7})
 	@Test
 	public void testConditionEquals6() {
-		assertTrue(!ArrayUtils.equals(new byte[]{1}, 0, new byte[0], anyInt(), anyInt()));
+		assertTrue(!ArrayUtils.equals(new byte[]{1}, 0, new byte[0], IGNORE, IGNORE));
 	}
 	
 	@Cover(
@@ -239,7 +239,6 @@ public class ArrayUtilsTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testBoundaryEquals3() {
 		ArrayUtils.equals(new byte[]{1,2}, 0, new byte[]{1,2}, 0, -1);
-		Mockito.anyInt();
 	}
 	
 	@Cover(methodSignature = SIGNATURE_EQUALS, boundaries = {21,28})
